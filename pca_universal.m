@@ -4,16 +4,21 @@ close all;
 
 % Specify the bands inside the specBands as 2D Matrices
 % NOTE: All the bands should be of same size
+
 specBands = {
     [255, 100; 150, 200];
     [200, 50; 100, 50];
     [50, 150; 200, 255];
     };
-% For specBands use this
+
+% Example for band images
+% specBands = {
+%     imread("sample.jpg");
+%     imread("sample2.jpg");
+%     };
+
 bands = cat(3,specBands{1:end});
 
-% For RGB band images use this
-% bands = double(imread("sample.jpg"));
 
 % Number of bands
 dim = size(bands,3);
@@ -21,22 +26,16 @@ dim = size(bands,3);
 
 % Band averages
 band_bars = zeros(1,dim);
-for i = 1:dim
-    band_bars(i) = mean2(bands(:,:,i));
-end
+band_bars(:) = mean(bands(:,:,1:end),[1 2]);
 
 % Band column vectors
 band_vecs = zeros(numel(bands(:,:,1)),dim);
-for i = 1:dim
-    band_vecs(:,i) = reshape(bands(:,:,i),numel(bands(:,:,i)),1);
-end
+band_vecs(:,1:end) = reshape(bands(:,:,1:end),numel(bands(:,:,1)),dim);
 
 % Calculating covariances
 covarianceMatrix = zeros(dim,dim);
 for i=1:dim
-    for j=1:dim
-        covarianceMatrix(i,j) = (1/(numel(bands(:,:,i))-1))*sum((band_vecs(:,i)-band_bars(i)).*(band_vecs(:,j)-band_bars(j)));
-    end
+    covarianceMatrix(i,:) = (1/(numel(bands(:,:,i))-1))*sum((band_vecs(:,i)-band_bars(i)).*(band_vecs(:,1:end)-band_bars(1:end)));
 end
 
 if(dim<11)
@@ -52,21 +51,21 @@ if(dim<11)
     disp(transFormMat);
 end
 
-RGBMat = band_vecs(:,1:dim) - band_bars(1:dim);
-PCA = RGBMat*transFormMat;
+AllBandMat = band_vecs(:,1:dim) - band_bars(1:dim);
+PCA = AllBandMat*transFormMat;
 
 % Getting Principal Components
 pCs = [];
-PrinComp = cell(2,dim);
+PrinComps = cell(2,dim);
 for i = 1:dim
     pca_temp = reshape(PCA(:,i),size(bands(:,:,i)));
     pCs = cat(3,pCs,pca_temp);
-    PrinComp{1,i} = round(eigenVal(i),3);
-    PrinComp{2,i} = pCs(:,:,i);
+    PrinComps{1,i} = round(eigenVal(i),3);
+    PrinComps{2,i} = pCs(:,:,i);
 end
 
 for i = 1:dim
-    fprintf("PC%d: eig = %f\n",i,eigenVal(i));
+    fprintf("PC%d: eigenVal = %f\n",i,eigenVal(i));
     if(size(bands(:,:,i))<11), disp(pCs(:,:,i)); end
 end
 
@@ -79,9 +78,7 @@ end
 % Calculating covariances of principal components
 Cov_PCA = zeros(dim,dim);
 for i=1:dim
-    for j=1:dim
-        Cov_PCA(i,j) = round((1/(numel(pCs(:,:,i))-1))*sum((PCA(:,i)).*(PCA(:,j))),3);
-    end
+    Cov_PCA(i,:) = round((1/(numel(pCs(:,:,i))-1))*sum((PCA(:,i)).*(PCA(:,1:end))),3);
 end
 
 % Checking if the principal components are orthogonal (Optional)
