@@ -17,6 +17,7 @@ bands = cat(3,specBands{1:end});
 
 % Number of bands
 dim = size(bands,3);
+[M,N] = size(bands(:,:,1));
 
 % Band averages
 band_bars = zeros(1,dim);
@@ -43,6 +44,7 @@ if(dim<11)
     disp(covarianceMatrix);
 end
 
+% Calculating Eigenvalues and Eigenvectors matrix
 eigenVal = eig(covarianceMatrix);
 [transFormMat,D] = eig(covarianceMatrix);
 if(dim<11)
@@ -54,15 +56,18 @@ RGBMat = band_vecs(:,1:dim) - band_bars(1:dim);
 PCA = RGBMat*transFormMat;
 
 % Getting Principal Components
-prinComp = [];
+pCs = [];
+PrinComp = cell(2,dim);
 for i = 1:dim
     pca_temp = reshape(PCA(:,i),size(bands(:,:,i)));
-    prinComp = cat(3,prinComp,pca_temp);
+    pCs = cat(3,pCs,pca_temp);
+    PrinComp{1,i} = round(eigenVal(i),3);
+    PrinComp{2,i} = pCs(:,:,i);
 end
 
 for i = 1:dim
     fprintf("PC%d: eig = %f\n",i,eigenVal(i));
-    if(size(bands(:,:,i))<11), disp(prinComp(:,:,i)); end
+    if(size(bands(:,:,i))<11), disp(pCs(:,:,i)); end
 end
 
 % PCA Averages [comes as zero always]
@@ -75,7 +80,7 @@ end
 Cov_PCA = zeros(dim,dim);
 for i=1:dim
     for j=1:dim
-        Cov_PCA(i,j) = round((1/(numel(prinComp(:,:,i))-1))*sum((PCA(:,i)).*(PCA(:,j))),3);
+        Cov_PCA(i,j) = round((1/(numel(pCs(:,:,i))-1))*sum((PCA(:,i)).*(PCA(:,j))),3);
     end
 end
 
