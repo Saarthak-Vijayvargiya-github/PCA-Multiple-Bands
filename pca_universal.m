@@ -5,21 +5,22 @@ close all;
 % Specify the bands inside the specBands as 2D Matrices
 % NOTE: All the bands should be of same size
 
-specBands = {
-    [255, 100; 150, 200];
-    [200, 50; 100, 50];
-    [50, 150; 200, 255];
-    };
-
-% Example for band images
 % specBands = {
-%     imread("sample.jpg");
-%     imread("sample2.jpg");
+%     [255, 100; 150, 200];
+%     [200, 50; 100, 50];
+%     [50, 150; 200, 255];
 %     };
 
+% Example for band images
+specBands = {
+    imread("sample.jpg");
+    imread("sample2.jpg");
+    };
+
+showImages = true;
+
+
 bands = cat(3,specBands{1:end});
-
-
 % Number of bands
 dim = size(bands,3);
 [M,N] = size(bands(:,:,1));
@@ -67,6 +68,11 @@ end
 for i = 1:dim
     fprintf("PC%d: eigenVal = %f\n",i,eigenVal(i));
     if(size(bands(:,:,i))<11), disp(pCs(:,:,i)); end
+    if(showImages)
+        figure;
+        imshow(PrinComps{2,i});
+        title(sprintf("Eigen Value = %f",eigenVal(i)));
+    end
 end
 
 % PCA Averages [comes as zero always]
