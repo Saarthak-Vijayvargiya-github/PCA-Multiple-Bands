@@ -7,12 +7,13 @@ close all;
 specBands = {
     [255, 100; 150, 200];
     [200, 50; 100, 50];
-    [50, 150; 200, 255]
+    [50, 150; 200, 255];
     };
+% For specBands use this
+bands = cat(3,specBands{1:end});
 
-% bands = cat(3,specBands{1:end});
-
-bands = double(imread("sample.jpg"));
+% For RGB band images use this
+% bands = double(imread("sample.jpg"));
 
 % Number of bands
 dim = size(bands,3);
@@ -64,7 +65,7 @@ for i = 1:dim
     if(size(bands(:,:,i))<11), disp(prinComp(:,:,i)); end
 end
 
-% PCA Averages come as zero always
+% PCA Averages [comes as zero always]
 % pca_bars = zeros(1,dim);
 % for i = 1:dim
 %     pca_bars(i) = mean2(prinComponents(:,:,i));
