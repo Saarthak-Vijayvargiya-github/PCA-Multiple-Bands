@@ -14,7 +14,7 @@ close all;
 % Example for band images
 specBands = {
     imread("sample.jpg");
-%     imread("sample2.jpg");
+    imread("sample2.jpg");
     };
 
 showImages = true;
@@ -70,11 +70,13 @@ for i = 1:dim
     if(size(bands(:,:,i))<11), disp(pCs(:,:,i)); end
     if(showImages)
         figure;
+        subplot(1,2,1)
         % To normalise upto 1
-        imshow((PrinComps{2,i})/max(PrinComps{2,i},[],'all'));
+            imshow((PrinComps{2,i})/max(PrinComps{2,i},[],'all'));
+        subplot(1,2,2)
         % To normalize from 0 to 1
-%         imshow((PrinComps{2,i} + abs(min(PrinComps{2,i},[],'all')))/max(PrinComps{2,i},[],'all'));
-        title(sprintf("Eigen Value = %f",eigenVal(i)));
+            imshow((PrinComps{2,i} - min(PrinComps{2,i},[],'all'))/(max(PrinComps{2,i},[],'all')-min(PrinComps{2,i},[],'all')));
+        sgtitle(sprintf("Eigen Value = %f",eigenVal(i)));
     end
 end
 
